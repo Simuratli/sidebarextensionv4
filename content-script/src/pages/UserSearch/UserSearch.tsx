@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const User = () => {
+const UserSearch = () => {
   const [updated, setupdated] = useState(false);
 
   useEffect(() => {
@@ -9,8 +9,9 @@ const User = () => {
       setupdated(false);
     }, 2000);
   }, []);
+  return (
+    <div>UserSearch - {updated && "UPDATEDs"}</div>
+  )
+}
 
-  return <div>User page - {updated && "updated"}</div>;
-};
-
-export default User;
+export default UserSearch

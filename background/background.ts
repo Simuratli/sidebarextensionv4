@@ -13,8 +13,6 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(
   { url: [{ urlMatches: ".*" }] },
 );
 
-
-
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.type == MESSAGE_ENUMS.HANDLE_LOGIN_TRIGGERED) {
     const { clientId, crmUrl, tenantId, challenge } = request.options;
@@ -44,7 +42,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
       });
     }
     if (code && code.includes("0.AV")) {
-      console.log(code,'authCode')
+      console.log(code, "authCode");
       chrome.tabs.query({}, function (tabs) {
         tabs.forEach(function (tab) {
           chrome.tabs.sendMessage(tab.id ? tab.id : 123, {

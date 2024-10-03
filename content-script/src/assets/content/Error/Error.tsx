@@ -1,12 +1,13 @@
+import React from "react";
 import "../../style/content/error.scss";
-import { InfoBigIcon } from "../../assets";
-import { Header, Button, TutorialButton } from "../../components";
-import { useStore } from "../../store";
+import { InfoBigIcon } from "../../../assets";
+import { Header, Button, TutorialButton } from "../../../components";
+import { useStore } from "../../../store";
 import {
   PAGE_ENUM,
   BUTTON_ENUM,
   ERROR_PAGE_TYPE,
-} from "../../types/global.types";
+} from "../../../types/global.types";
 import { ErrorPagePropType } from "./Error.types";
 function Error({ page }: ErrorPagePropType) {
   const { setPage, errorForCredentials, errorText } = useStore();
