@@ -20,6 +20,7 @@ import {
 import { useStore } from "../store";
 import { getAccessTokenRequest } from "../api";
 import { getTimeDifferenceForToken } from "../utils/getTimeDifference";
+import { useUserSearchButton } from "./useUserSearchButton";
 
 export const usePaging = () => {
   const [updated, setUpdated] = useState(true);
@@ -36,7 +37,11 @@ export const usePaging = () => {
     crmUrl,
     setAccessToken,
     setRefreshToken,
+    setTenantId,
+    setCrmUrl,
+    setClientId,
   } = useStore();
+  const { addForUserSearch } = useUserSearchButton();
 
   useEffect(() => {
     const messageListener = (message) => {
@@ -64,61 +69,102 @@ export const usePaging = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!updated) {
-      setPageViaUrl();
-    }
-  }, [updated,accessToken,authToken]);
+  const putIconsToScreen = () => {
+    addForUserSearch();
+    setTimeout(() => {
+      addForUserSearch();
+    }, 3000);
+  };
 
   useEffect(() => {
-    const refreshTime = localStorage.getItem(STORAGED_ENUM.REFRESH_TIME);
-    const refreshToken = localStorage.getItem(STORAGED_ENUM.REFRESH_TOKEN);
-    const accessToken = localStorage.getItem(STORAGED_ENUM.ACCESS_TOKEN);
-    const authToken = localStorage.getItem(STORAGED_ENUM.AUTH_TOKEN);
-    if (refreshTime && accessToken && refreshToken && authToken) {
-      const timeDifference = getTimeDifferenceForToken(new Date(refreshTime));
-      if (timeDifference < 9) {
-        setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
+    setPageViaUrl();
+    if (!updated) {
+      putIconsToScreen();
+    }
+  }, [updated, accessToken, authToken]);
+
+  useEffect(() => {
+    putIconsToScreen();
+    const storagedRefreshTime = localStorage.getItem(STORAGED_ENUM.REFRESH_TIME);
+    const storagedRefreshToken = localStorage.getItem(STORAGED_ENUM.REFRESH_TOKEN);
+    const storagedAccessToken = localStorage.getItem(STORAGED_ENUM.ACCESS_TOKEN);
+    const storagedAuthToken = localStorage.getItem(STORAGED_ENUM.AUTH_TOKEN);
+
+    if (storagedRefreshTime && storagedAccessToken && storagedRefreshToken && storagedAuthToken) {
+        setAccessToken(storagedAccessToken);
+        setRefreshToken(storagedRefreshToken);
         setAuthToken(authToken);
-      } else {
+
+      const timeDifference = getTimeDifferenceForToken(new Date(storagedRefreshTime));
+      if (timeDifference >= 8) {
         localStorage.removeItem(STORAGED_ENUM.REFRESH_TIME);
         localStorage.removeItem(STORAGED_ENUM.REFRESH_TOKEN);
         localStorage.removeItem(STORAGED_ENUM.ACCESS_TOKEN);
         localStorage.removeItem(STORAGED_ENUM.AUTH_TOKEN);
-      }
+      } 
     }
   }, []);
 
+
   useEffect(() => {
+    const storagedRefreshToken = localStorage.getItem(STORAGED_ENUM.REFRESH_TOKEN);
+    const storagedRefreshTime = localStorage.getItem(STORAGED_ENUM.REFRESH_TIME);
+    const storagedClientId = localStorage.getItem(STORAGED_ENUM.CLIENT_ID);
+
+    if(storagedRefreshTime && storagedRefreshToken){
+      const timeDifference = getTimeDifferenceForToken(new Date(storagedRefreshTime));
+      if(timeDifference > 1){
+        getAccessTokenRequest(clientId,tenantId,crmUrl,code_verifier,ACCESS_TOKEN_ENUM.REFRESH,storagedRefreshToken).then((response) => {
+          if (response.access_token) {
+            setAccessToken(response.access_token);
+            setRefreshToken(response.refresh_token);
+            localStorage.setItem(STORAGED_ENUM.ACCESS_TOKEN,response.access_token);
+            localStorage.setItem(STORAGED_ENUM.REFRESH_TOKEN,response.refresh_token);
+            localStorage.setItem(STORAGED_ENUM.REFRESH_TIME, `${new Date()}`);
+         
+          }
+        });
+      }
+    }
+    setPageViaUrl();
+  }, [updated,authToken,clientId,crmUrl,code_verifier,tenantId])
+  
+
+  
+
+  useEffect(() => {
+    const storagedTenantId = localStorage.getItem(STORAGED_ENUM.TENANT_ID);
+    const storagedClientId = localStorage.getItem(STORAGED_ENUM.CLIENT_ID);
+    const storagedCRMUrl = localStorage.getItem(STORAGED_ENUM.CRM_URL);
+    if (storagedClientId && storagedCRMUrl && storagedTenantId) {
+      setClientId(storagedClientId);
+      setTenantId(storagedTenantId);
+      setCrmUrl(storagedCRMUrl);
+    }
+  }, []);
+
+
+
+
+  useEffect(() => {
+    console.log("TOKENS",authToken)
     if (!accessToken && authToken) {
-      getAccessTokenRequest(
-        clientId,
-        tenantId,
-        crmUrl,
-        code_verifier,
-        ACCESS_TOKEN_ENUM.BASIC,
-        authToken
-      ).then((response) => {
+      getAccessTokenRequest(clientId,tenantId,crmUrl,code_verifier,ACCESS_TOKEN_ENUM.BASIC,authToken).then((response) => {
         if (response.access_token) {
           setAccessToken(response.access_token);
           setRefreshToken(response.refresh_token);
-          localStorage.setItem(
-            STORAGED_ENUM.ACCESS_TOKEN,
-            response.access_token
-          );
-          localStorage.setItem(
-            STORAGED_ENUM.REFRESH_TOKEN,
-            response.refresh_token
-          );
+          localStorage.setItem(STORAGED_ENUM.ACCESS_TOKEN,response.access_token);
+          localStorage.setItem(STORAGED_ENUM.REFRESH_TOKEN,response.refresh_token);
           localStorage.setItem(STORAGED_ENUM.REFRESH_TIME, `${new Date()}`);
+          console.log(accessToken,'========noluyor arkadas================ IF',authToken)
           setPageViaUrl();
         }
       });
     } else {
+    console.log(accessToken,'========noluyor arkadas================ ELSE',authToken)
       setPageViaUrl();
     }
-  }, [authToken, accessToken]);
+  }, [authToken, accessToken,clientId,tenantId,crmUrl,code_verifier]);
 
   const setPageViaUrl = () => {
     const url = window.location.href;
@@ -131,10 +177,12 @@ export const usePaging = () => {
             url.includes(LINKEDIN_PAGE_ENUM.SALES_COMPANY):
             setPage(PAGE_ENUM.COMPANY);
             break;
-          case url.includes(LINKEDIN_PAGE_ENUM.SALES_COMPANY_SEARCH) || url.includes(LINKEDIN_PAGE_ENUM.COMPANY_SEARCH):
+          case url.includes(LINKEDIN_PAGE_ENUM.SALES_COMPANY_SEARCH) ||
+            url.includes(LINKEDIN_PAGE_ENUM.COMPANY_SEARCH):
             setPage(PAGE_ENUM.SEARCH_COMPANY_SCRAPE);
             break;
-          case url.includes(LINKEDIN_PAGE_ENUM.SALES_USER_SEARCH) || url.includes(LINKEDIN_PAGE_ENUM.PEOPLE_SEARCH):
+          case url.includes(LINKEDIN_PAGE_ENUM.SALES_USER_SEARCH) ||
+            url.includes(LINKEDIN_PAGE_ENUM.PEOPLE_SEARCH):
             setPage(PAGE_ENUM.SEARCH_PEOPLE_SCRAPE);
             break;
           case url.includes(LINKEDIN_PAGE_ENUM.USER) ||
@@ -153,7 +201,6 @@ export const usePaging = () => {
       }
     }
   };
-
 
   const CurrentPage = () => {
     switch (page) {
@@ -176,7 +223,7 @@ export const usePaging = () => {
       case PAGE_ENUM.SEARCH_PEOPLE_SCRAPE:
         return <UserSearchPage />;
       default:
-        return <SetupPage />;
+        return <></>;
     }
   };
 

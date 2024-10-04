@@ -42,7 +42,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
       });
     }
     if (code && code.includes("0.AV")) {
-      console.log(code, "authCode");
       chrome.tabs.query({}, function (tabs) {
         tabs.forEach(function (tab) {
           chrome.tabs.sendMessage(tab.id ? tab.id : 123, {

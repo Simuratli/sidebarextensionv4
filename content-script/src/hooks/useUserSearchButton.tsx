@@ -1,39 +1,55 @@
 import React from "react";
-import {UserSearchControlButton} from '../components'
+import ReactDOM from "react-dom";
+import { UserSearchControlButton } from "../components";
 
-const useUserSearchButton = () => {
-  const addControlForUser = () => {
-    let header = document.querySelector(".ph5");
-    if (!header) {
-      header = document.querySelector(".pb5");
-    }
-    let LinkProfile = header
-      ?.querySelector(".artdeco-hoverable-trigger")
-      ?.querySelector("a");
+export const useUserSearchButton = () => {
+  const addForUserSearch = async () => {
+    const usernames = document.querySelectorAll(".entity-result__title-line");
+    usernames.forEach((user) => {
+      const mainParentCard = user.parentElement?.parentElement?.parentElement;
+      user.classList.add("noOverflow");
+      const image =
+        mainParentCard?.parentElement?.parentElement?.querySelector("img")?.src;
+      const userName = mainParentCard
+        ?.querySelector("a")
+        ?.querySelector('[aria-hidden="true"]')
+        ?.textContent?.trim();
+      const job = mainParentCard
+        ?.querySelector(".entity-result__primary-subtitle")
+        ?.textContent?.trim();
+      const location = mainParentCard
+        ?.querySelector(".entity-result__secondary-subtitle")
+        ?.textContent?.trim();
 
-    if (!LinkProfile) {
-      LinkProfile = header
-        ?.querySelectorAll(
-          ".artdeco-hoverable-trigger--content-placed-bottom"
-        )[1]
-        .querySelector("a");
-    }
-    const idForLinkedinIconElelement =
-      document.querySelector("#idForLinkedinIcon");
-
-    if (!idForLinkedinIconElelement) {
-      const div = document.createElement("div");
-      div.id = "idForLinkedinIcon";
-      if (LinkProfile) {
-        // LinkProfile.append(div);
-        LinkProfile.insertAdjacentElement("afterend", div);
+      const userElement = user as HTMLElement;
+      // userElement.style.position = 'relative';
+      // userElement.style.overflow = 'auto';
+      userElement.style.width = "100%";
+      const LinkProfile = user?.querySelector(".entity-result__title-text");
+      const idForLinkedinIconElelement =
+        user.querySelector(".idForLinkedinIcon");
+      if (!idForLinkedinIconElelement) {
+        const div = document.createElement("div");
+        div.classList.add("idForLinkedinIcon");
+        if (LinkProfile) {
+          LinkProfile.appendChild(div);
+        }
+      } else {
+        ReactDOM.render(
+          <UserSearchControlButton
+            name={userName}
+            job={job}
+            image={image}
+            location={location}
+            url={LinkProfile?.querySelector("a")?.href.split("?")[0]}
+          />,
+          idForLinkedinIconElelement,
+        );
       }
-    } else {
-      ReactDOM.render(<UserControl />, idForLinkedinIconElelement);
-    }
+    });
   };
 
-  return <div>useUserSearchButton</div>;
+  return {
+    addForUserSearch,
+  };
 };
-
-export default useUserSearchButton;

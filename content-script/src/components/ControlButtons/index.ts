@@ -1,1 +1,1 @@
-export {default as UserSearchControlButton} from './UserSearchControlButton'
+export { default as UserSearchControlButton } from "./UserSearchControlButton";
