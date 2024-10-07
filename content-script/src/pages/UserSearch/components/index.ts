@@ -1,7 +1,4 @@
-import  UserSearchExist from './UserSearchExist'
-import UserSearchNotExist from './UserSearchNotExist'
+import UserSearchExist from "./UserSearchExist";
+import UserSearchNotExist from "./UserSearchNotExist";
 
-export {
-    UserSearchExist,
-    UserSearchNotExist
-}
+export { UserSearchExist, UserSearchNotExist };

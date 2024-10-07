@@ -1,16 +1,14 @@
-import React,{useEffect} from 'react'
-import { useStore } from '../../../store'
+import React, { useEffect } from "react";
+import { useStore } from "../../../store";
 
 const UserSearchExist = () => {
-  const {userBackendData} = useStore()
+  const { userBackendData } = useStore();
 
   useEffect(() => {
-   console.log(userBackendData,'EXIST ')
-  }, [])
-  
-  return (
-    <div>UserSearchExist</div>
-  )
-}
+    console.log(userBackendData, "EXIST ");
+  }, []);
 
-export default UserSearchExist
+  return <div>UserSearchExist</div>;
+};
+
+export default UserSearchExist;

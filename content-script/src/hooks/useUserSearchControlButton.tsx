@@ -12,7 +12,7 @@ export const useUserSearchControlButton = (
   image: string,
   company: string,
   description: string,
-  jobCompanyId:string,
+  jobCompanyId: string,
 ) => {
   const {
     webApiEndpoint,
@@ -30,7 +30,7 @@ export const useUserSearchControlButton = (
     setJobTitle,
     setUserAdress,
     setUserProfileImage,
-    setDescription
+    setDescription,
   } = useStore();
   const [ifExist, setIfExist] = useState(null);
   const [showMainInfoDetail, setShowMainInfoDetail] = useState(false);
@@ -57,7 +57,7 @@ export const useUserSearchControlButton = (
                 ? response.companyData[0]
                 : null,
           });
-        }
+        },
       );
     }
   }, [url, webApiEndpoint, accessToken]);
@@ -71,14 +71,15 @@ export const useUserSearchControlButton = (
     setUserAdress(location);
     setUserProfileImage(image);
     setDescription(description);
-    const selectedUser = searchControlData.filter((data)=>data.id === image)[0]
-    console.log(selectedUser,'selectedUser')
-    if(selectedUser.existedData){
+    const selectedUser = searchControlData.filter(
+      (data) => data.id === image,
+    )[0];
+    if (selectedUser.existedData) {
       setUserBackendData(selectedUser.existedData);
     }
-    if(selectedUser.existedUsersCompanyData){
-      setCompanyBackendData(selectedUser.existedUsersCompanyData)
-    } 
+    if (selectedUser.existedUsersCompanyData) {
+      setCompanyBackendData(selectedUser.existedUsersCompanyData);
+    }
     setSidebarOpen(true);
     setLoading(false);
   };
@@ -97,9 +98,13 @@ export const useUserSearchControlButton = (
         address1_name: location,
         uds_linkedin: url,
       };
-      
 
-      const response = await createDataverse(`${webApiEndpoint}/contacts`, accessToken,userRequest,"POST");
+      const response = await createDataverse(
+        `${webApiEndpoint}/contacts`,
+        accessToken,
+        userRequest,
+        "POST",
+      );
       setUserBackendData(response);
       const newSearchUrl = searchControlData.map((data) => ({
         ...data,
@@ -109,8 +114,6 @@ export const useUserSearchControlButton = (
 
       setSearchControlData(newSearchUrl);
     }
-
-
   };
 
   return {

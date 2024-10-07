@@ -85,52 +85,81 @@ export const usePaging = () => {
 
   useEffect(() => {
     putIconsToScreen();
-    const storagedRefreshTime = localStorage.getItem(STORAGED_ENUM.REFRESH_TIME);
-    const storagedRefreshToken = localStorage.getItem(STORAGED_ENUM.REFRESH_TOKEN);
-    const storagedAccessToken = localStorage.getItem(STORAGED_ENUM.ACCESS_TOKEN);
+    const storagedRefreshTime = localStorage.getItem(
+      STORAGED_ENUM.REFRESH_TIME,
+    );
+    const storagedRefreshToken = localStorage.getItem(
+      STORAGED_ENUM.REFRESH_TOKEN,
+    );
+    const storagedAccessToken = localStorage.getItem(
+      STORAGED_ENUM.ACCESS_TOKEN,
+    );
     const storagedAuthToken = localStorage.getItem(STORAGED_ENUM.AUTH_TOKEN);
 
-    if (storagedRefreshTime && storagedAccessToken && storagedRefreshToken && storagedAuthToken) {
-        setAccessToken(storagedAccessToken);
-        setRefreshToken(storagedRefreshToken);
-        setAuthToken(authToken);
+    if (
+      storagedRefreshTime &&
+      storagedAccessToken &&
+      storagedRefreshToken &&
+      storagedAuthToken
+    ) {
+      setAccessToken(storagedAccessToken);
+      setRefreshToken(storagedRefreshToken);
+      setAuthToken(storagedAuthToken);
 
-      const timeDifference = getTimeDifferenceForToken(new Date(storagedRefreshTime));
+      const timeDifference = getTimeDifferenceForToken(
+        new Date(storagedRefreshTime),
+      );
       if (timeDifference >= 8) {
         localStorage.removeItem(STORAGED_ENUM.REFRESH_TIME);
         localStorage.removeItem(STORAGED_ENUM.REFRESH_TOKEN);
         localStorage.removeItem(STORAGED_ENUM.ACCESS_TOKEN);
         localStorage.removeItem(STORAGED_ENUM.AUTH_TOKEN);
-      } 
+      }
     }
+
+    setPageViaUrl();
   }, []);
 
-
   useEffect(() => {
-    const storagedRefreshToken = localStorage.getItem(STORAGED_ENUM.REFRESH_TOKEN);
-    const storagedRefreshTime = localStorage.getItem(STORAGED_ENUM.REFRESH_TIME);
+    const storagedRefreshToken = localStorage.getItem(
+      STORAGED_ENUM.REFRESH_TOKEN,
+    );
+    const storagedRefreshTime = localStorage.getItem(
+      STORAGED_ENUM.REFRESH_TIME,
+    );
     const storagedClientId = localStorage.getItem(STORAGED_ENUM.CLIENT_ID);
 
-    if(storagedRefreshTime && storagedRefreshToken){
-      const timeDifference = getTimeDifferenceForToken(new Date(storagedRefreshTime));
-      if(timeDifference > 1){
-        getAccessTokenRequest(clientId,tenantId,crmUrl,code_verifier,ACCESS_TOKEN_ENUM.REFRESH,storagedRefreshToken).then((response) => {
+    if (storagedRefreshTime && storagedRefreshToken) {
+      const timeDifference = getTimeDifferenceForToken(
+        new Date(storagedRefreshTime),
+      );
+      if (timeDifference > 1) {
+        getAccessTokenRequest(
+          clientId,
+          tenantId,
+          crmUrl,
+          code_verifier,
+          ACCESS_TOKEN_ENUM.REFRESH,
+          storagedRefreshToken,
+        ).then((response) => {
           if (response.access_token) {
             setAccessToken(response.access_token);
             setRefreshToken(response.refresh_token);
-            localStorage.setItem(STORAGED_ENUM.ACCESS_TOKEN,response.access_token);
-            localStorage.setItem(STORAGED_ENUM.REFRESH_TOKEN,response.refresh_token);
+            localStorage.setItem(
+              STORAGED_ENUM.ACCESS_TOKEN,
+              response.access_token,
+            );
+            localStorage.setItem(
+              STORAGED_ENUM.REFRESH_TOKEN,
+              response.refresh_token,
+            );
             localStorage.setItem(STORAGED_ENUM.REFRESH_TIME, `${new Date()}`);
-         
           }
         });
       }
     }
     setPageViaUrl();
-  }, [updated,authToken,clientId,crmUrl,code_verifier,tenantId])
-  
-
-  
+  }, [updated, authToken, clientId, crmUrl, code_verifier, tenantId]);
 
   useEffect(() => {
     const storagedTenantId = localStorage.getItem(STORAGED_ENUM.TENANT_ID);
@@ -143,28 +172,35 @@ export const usePaging = () => {
     }
   }, []);
 
-
-
-
   useEffect(() => {
-    console.log("TOKENS",authToken)
     if (!accessToken && authToken) {
-      getAccessTokenRequest(clientId,tenantId,crmUrl,code_verifier,ACCESS_TOKEN_ENUM.BASIC,authToken).then((response) => {
+      getAccessTokenRequest(
+        clientId,
+        tenantId,
+        crmUrl,
+        code_verifier,
+        ACCESS_TOKEN_ENUM.BASIC,
+        authToken,
+      ).then((response) => {
         if (response.access_token) {
           setAccessToken(response.access_token);
           setRefreshToken(response.refresh_token);
-          localStorage.setItem(STORAGED_ENUM.ACCESS_TOKEN,response.access_token);
-          localStorage.setItem(STORAGED_ENUM.REFRESH_TOKEN,response.refresh_token);
+          localStorage.setItem(
+            STORAGED_ENUM.ACCESS_TOKEN,
+            response.access_token,
+          );
+          localStorage.setItem(
+            STORAGED_ENUM.REFRESH_TOKEN,
+            response.refresh_token,
+          );
           localStorage.setItem(STORAGED_ENUM.REFRESH_TIME, `${new Date()}`);
-          console.log(accessToken,'========noluyor arkadas================ IF',authToken)
           setPageViaUrl();
         }
       });
     } else {
-    console.log(accessToken,'========noluyor arkadas================ ELSE',authToken)
       setPageViaUrl();
     }
-  }, [authToken, accessToken,clientId,tenantId,crmUrl,code_verifier]);
+  }, [authToken, accessToken]);
 
   const setPageViaUrl = () => {
     const url = window.location.href;

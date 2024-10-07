@@ -22,5 +22,6 @@ export const useCredentialState: StateCreator<CredentialsState> = (set) => ({
   setTenantId: (value: string) => set({ tenantId: value }),
   setErrorForCredentials: (value: string) =>
     set({ errorForCredentials: value }),
-  setCrmUrl: (value: string) =>set({ crmUrl: value, webApiEndpoint: `${value}/api/data/v9.2` }),
+  setCrmUrl: (value: string) =>
+    set({ crmUrl: value, webApiEndpoint: `${value}/api/data/v9.2` }),
 });
